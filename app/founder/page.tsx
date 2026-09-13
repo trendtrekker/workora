@@ -1,1 +1,4 @@
-import FinancialHistory from './FinancialHistory';import DomainPanels from './DomainPanels';export default function FounderPage(){return <main className="founder"><aside><b className="logo">W<span>·</span></b><label>WORKORA</label><nav><a className="selected">Overview</a><a>Merchants</a><a>Subscriptions</a><a>Support</a><a>Audit log</a></nav></aside><section className="body"><header><div><small>FOUNDER CONSOLE</small><h1>Platform overview</h1><p>Live Workora performance and operational health.</p></div></header><FinancialHistory/><DomainPanels/></section></main>}
+import FinancialHistory from './FinancialHistory';
+import DomainPanels from './DomainPanels';
+import FounderNav from './FounderNav';
+export default function FounderPage(){return <main className="founder"><FounderNav/><section className="body"><header><div><small>FOUNDER CONSOLE</small><h1>Platform overview</h1><p>Live Workora performance and operational health.</p></div></header><FinancialHistory/><DomainPanels/></section></main>}
