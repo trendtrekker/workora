@@ -26,7 +26,13 @@ export async function verifyTotp(secretBase32: string, code: string, now = Date.
 
 export async function createSession(userId: string, deviceName?: string) {
   const db = getNeon(); const raw = crypto.randomUUID() + crypto.randomUUID(); const tokenHash = await derivePasswordHash(raw, '776f726b6f72615f73657373696f6e'); const expires = new Date(Date.now() + sessionHours * 60 * 60 * 1000);
-  const rows = await db`insert into workora.sessions (user_id, token_hash, device_name, expires_at) values (${userId}, ${tokenHash}, ${deviceName ?? 'Unknown device'}, ${expires.toISOString()}) returning id, expires_at`;
+  const rows = await db`with created as (
+    insert into workora.sessions (user_id,token_hash,device_name,expires_at)
+    values (${userId},${tokenHash},${deviceName ?? 'Unknown device'},${expires.toISOString()}) returning id,expires_at
+  ), logged as (
+    insert into workora.audit_events(actor_type,actor_id,action,target_type,target_id,request_id)
+    select 'internal_user',${userId},'auth.sign_in','session',id,${crypto.randomUUID()} from created returning id
+  ) select created.id,created.expires_at from created cross join logged`;
   return { raw, id: String(rows[0].id), expiresAt: new Date(rows[0].expires_at).toISOString() };
 }
 
