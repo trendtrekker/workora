@@ -1,0 +1,8 @@
+create table if not exists workora.merchants (id uuid primary key default gen_random_uuid(), name text not null, status text not null default 'active', created_at timestamptz not null default now());
+create table if not exists workora.subscriptions (id uuid primary key default gen_random_uuid(), merchant_id uuid references workora.merchants(id), gross_revenue numeric(12,2) not null default 0, refunds numeric(12,2) not null default 0, discounts numeric(12,2) not null default 0, taxes numeric(12,2) not null default 0, failed_payment boolean not null default false, created_at timestamptz not null default now());
+create table if not exists workora.alerts (id uuid primary key default gen_random_uuid(), severity text not null default 'info', title text not null, message text not null, acknowledged_at timestamptz, created_at timestamptz not null default now());
+create table if not exists workora.support_sessions (id uuid primary key default gen_random_uuid(), merchant_id uuid references workora.merchants(id), status text not null default 'open', channel text not null default 'email', created_at timestamptz not null default now());
+create table if not exists workora.audit_events (id uuid primary key default gen_random_uuid(), actor_user_id uuid references workora.internal_users(id), action text not null, resource_type text, resource_id text, metadata jsonb not null default '{}', created_at timestamptz not null default now());
+grant usage on schema workora to awah_runtime;
+grant select, insert, update, delete on all tables in schema workora to awah_runtime;
+grant usage, select on all sequences in schema workora to awah_runtime;
