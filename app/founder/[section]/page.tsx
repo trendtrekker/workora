@@ -4,6 +4,7 @@ import {getFounderIdentity} from '@/lib/auth';
 import {getRecords, sections, type Section} from '@/lib/founder-records';
 import FounderNav from '../FounderNav';
 import CreateSupport from '../CreateSupport';
+import SupportStatus from '../SupportStatus';
 
 export default async function RecordsPage({params,searchParams}:{params:Promise<{section:string}>;searchParams:Promise<{q?:string;page?:string}>}) {
   const {section: name} = await params;
@@ -24,7 +25,7 @@ export default async function RecordsPage({params,searchParams}:{params:Promise<
     {section==='support'&&<CreateSupport/>}
     <form method="get" className="panel"><label htmlFor="record-search">Search {config.title.toLowerCase()}</label>{' '}<input id="record-search" name="q" defaultValue={search} maxLength={200}/>{' '}<button type="submit">Search</button>{' '}<Link href={`/founder/${section}`}>Clear</Link></form>
     <section className="panel" style={{marginTop:16}}>
-      {!result?<p role="alert">Records could not be loaded. Please reload to retry.</p>:!result.rows.length?<p>No matching records.</p>:result.rows.map(row=><details key={String(row.id)} style={{padding:'16px 0',borderBottom:'1px solid #e6e3e8'}}><summary style={{cursor:'pointer'}}>{String(row.name??row.action??row.id)} {row.status?` · ${row.status}`:''} · {new Date(row.created_at).toISOString().slice(0,10)}</summary><dl>{config.fields.map(field=><div key={field} style={{display:'flex',gap:16,flexWrap:'wrap',margin:'12px 0'}}><dt style={{minWidth:150,fontWeight:600}}>{field.replaceAll('_',' ')}</dt><dd style={{margin:0,overflowWrap:'anywhere'}}>{row[field]===null?'—':field==='created_at'?new Date(row[field]).toISOString():String(row[field])}</dd></div>)}</dl></details>)}
+      {!result?<p role="alert">Records could not be loaded. Please reload to retry.</p>:!result.rows.length?<p>No matching records.</p>:result.rows.map(row=><details key={String(row.id)} style={{padding:'16px 0',borderBottom:'1px solid #e6e3e8'}}><summary style={{cursor:'pointer'}}>{String(row.name??row.action??row.id)} {row.status?` · ${row.status}`:''} · {new Date(row.created_at).toISOString().slice(0,10)}</summary><dl>{config.fields.map(field=><div key={field} style={{display:'flex',gap:16,flexWrap:'wrap',margin:'12px 0'}}><dt style={{minWidth:150,fontWeight:600}}>{field.replaceAll('_',' ')}</dt><dd style={{margin:0,overflowWrap:'anywhere'}}>{row[field]===null?'—':field==='created_at'?new Date(row[field]).toISOString():typeof row[field]==='object'?JSON.stringify(row[field]):String(row[field])}</dd></div>)}</dl>{section==='support'&&<SupportStatus id={String(row.id)} status={String(row.status)}/>}</details>)}
       <nav aria-label="Records pagination" style={{display:'flex',gap:24,marginTop:20}}>{page>1&&<Link href={url(page-1)}>Previous</Link>}<span>Page {page}</span>{result?.hasNext&&<Link href={url(page+1)}>Next</Link>}</nav>
     </section>
   </section></main>;
