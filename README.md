@@ -1,6 +1,6 @@
 # Workora
 
-Standalone Workora application scaffold. This repository is intentionally separate from the Dee & Dee cleaning application.
+Standalone Workora application scaffold. 
 
 ## Local setup
 
