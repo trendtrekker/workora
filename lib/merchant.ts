@@ -1,18 +1,19 @@
-import {createHash} from 'node:crypto';
-import {cookies} from 'next/headers';
 import {neon} from '@neondatabase/serverless';
 import {getNeon} from './neon';
+import {verifyShopifyIdentity} from './shopify-identity';
 
-// No caller-provided merchant ID is accepted. Only a server-side session linked
+// No caller-provided merchant ID is accepted. Only a verified Shopify identity linked
 // to an active, verified installation can choose the database tenant context.
-export async function getMerchantOverview() {
-  const token=(await cookies()).get('workora_merchant_session')?.value;
-  if(!token || !/^[a-f0-9]{64}$/.test(token)) return null;
-  const hash=createHash('sha256').update(token).digest('hex');
-  const identity=await getNeon()`select i.merchant_id from workora.merchant_sessions s
-    join workora.shop_installations i on i.id=s.installation_id
+export async function getMerchantOverview(authorization: string | null) {
+  const verified=await verifyShopifyIdentity(authorization);
+  if(!verified) return null;
+  // A valid Shopify identity cannot create or reactivate an installation.
+  // Onboarding must verify installation independently before adding this mapping.
+  const identity=await getNeon()`select i.merchant_id from workora.shop_installations i
     join workora.merchants m on m.id=i.merchant_id
-    where s.token_hash=${hash} and s.revoked_at is null and s.expires_at>now()
+    join workora.shop_memberships u on u.installation_id=i.id
+    where i.shop_domain=${verified.shop}
+      and u.shopify_user_id=${verified.userId} and u.revoked_at is null
       and i.revoked_at is null and i.verified_at<=now() and m.status='active' limit 1`;
   if(!identity[0]) return null;
   const url=process.env.MERCHANT_DATABASE_URL;

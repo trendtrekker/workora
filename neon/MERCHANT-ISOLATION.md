@@ -1,5 +1,7 @@
 # Merchant isolation rollout
 
+Current status: see STAGING-2026-09-22.md. The merchant overview now verifies
+Shopify bearer tokens; installation onboarding/token exchange remains pending.
 This foundation does not implement Shopify OAuth or issue merchant sessions.
 No merchant session may be issued until a Shopify installation has been
 verified by the server. Founder cookies are never accepted for merchant access.
