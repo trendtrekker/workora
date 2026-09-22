@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "vinext dev",
+    "build": "vinext build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -18,9 +18,13 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.57.2",
+    "@openai/sites-vite-plugin": "^0.2.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vinext": "^1.0.0-beta.5"
   }
 }
